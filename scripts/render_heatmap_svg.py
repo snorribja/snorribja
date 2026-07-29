@@ -16,8 +16,8 @@ HERE = os.path.dirname(__file__)
 IN_PATH = os.path.join(HERE, "..", "data", "contributions.json")
 OUT_PATH = os.path.join(HERE, "..", "contrib-heatmap.svg")
 
-# GitHub-ish green ramp: empty -> brightest. Level 5 is a brighter neon top end.
-PALETTE = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353", "#69f0a0"]
+# Blue-to-yellow ramp: empty -> brightest.
+PALETTE = ["#161b22", "#0d419d", "#1f6feb", "#58a6ff", "#d29922", "#f2cc60"]
 
 CELL = 12
 GAP = 3
@@ -32,7 +32,7 @@ BG2 = "#0d1420"
 FRAME = "#1f6feb"
 MUTED = "#7d8590"
 ACCENT = "#22d3ee"
-GREEN = "#39d353"
+BLUE = "#58a6ff"
 GOLD = "#f2cc60"
 
 # reveal timing (one-shot)
@@ -108,16 +108,29 @@ def render(data):
         snake_points.extend((grid_left + ci * STEP + CELL / 2, grid_top + ri * STEP + CELL / 2)
                             for ci in columns)
     snake_path = "M" + " L".join(f"{x:g},{y:g}" for x, y in snake_points)
+    snake_path_length = (len(snake_points) - 1) * STEP
+    snake_body_length = 150
+    snake_offset = round(snake_path_length * 0.12)
 
     css = f"""
 @keyframes cell {{
   0%   {{ opacity: 0; transform: translateY(-6px); }}
   100% {{ opacity: 1; transform: translateY(0); }}
 }}
+@keyframes snakeBody {{
+  from {{ stroke-dashoffset: -{snake_offset}; }}
+  to   {{ stroke-dashoffset: -{snake_offset + snake_path_length}; }}
+}}
+@keyframes snakeHead {{
+  from {{ stroke-dashoffset: -{snake_offset + snake_body_length}; }}
+  to   {{ stroke-dashoffset: -{snake_offset + snake_body_length + snake_path_length}; }}
+}}
 .c {{ opacity: 0; animation: cell {CELL_DUR:.2f}s cubic-bezier(.2,.8,.2,1) both; }}
+.snake-outline, .snake-body {{ animation: snakeBody 24s linear 1.4s infinite; }}
+.snake-head {{ animation: snakeHead 24s linear 1.4s infinite; }}
 @media (prefers-reduced-motion: reduce) {{
   .c {{ opacity: 1; animation: none; }}
-  .snake {{ display: none; }}
+  .snake-outline, .snake-body, .snake-head {{ animation: none; }}
 }}
 """.strip()
 
@@ -128,7 +141,6 @@ def render(data):
         '<defs>'
         f'<linearGradient id="hbg" x1="0" y1="0" x2="0" y2="1">'
         f'<stop offset="0" stop-color="{BG2}"/><stop offset="1" stop-color="{BG}"/></linearGradient>'
-        f'<path id="snake-path" d="{snake_path}"/>'
         '</defs>',
         f'<rect width="{canvas_w}" height="{canvas_h}" rx="12" fill="url(#hbg)"/>',
         f'<rect x="0.5" y="0.5" width="{canvas_w-1}" height="{canvas_h-1}" rx="12" '
@@ -164,16 +176,22 @@ def render(data):
                 f'<title>{date_s}: {count} contribution{plural}</title></rect>'
             )
 
-    parts.append('<g class="snake" aria-hidden="true">')
-    for i in range(6, -1, -1):
-        radius = 4.5 - i * 0.35
-        color = "#b4ffaa" if i == 0 else GREEN
-        parts.append(
-            f'<circle r="{radius:.2f}" fill="{color}" opacity="{1 - i*0.08:.2f}">'
-            f'<animateMotion dur="24s" begin="{1.4 + i*0.07:.2f}s" repeatCount="indefinite">'
-            f'<mpath href="#snake-path"/></animateMotion></circle>'
-        )
-    parts.append("</g>")
+    parts.append(
+        f'<g class="snake" aria-hidden="true" pointer-events="none">'
+        f'<path class="snake-outline" d="{snake_path}" fill="none" '
+        f'stroke="{BG}" stroke-width="11" stroke-linecap="round" '
+        f'stroke-dasharray="{snake_body_length} {snake_path_length - snake_body_length}" '
+        f'stroke-dashoffset="-{snake_offset}"/>'
+        f'<path class="snake-body" d="{snake_path}" fill="none" '
+        f'stroke="{GOLD}" stroke-width="7" stroke-linecap="round" '
+        f'stroke-dasharray="{snake_body_length} {snake_path_length - snake_body_length}" '
+        f'stroke-dashoffset="-{snake_offset}"/>'
+        f'<path class="snake-head" d="{snake_path}" fill="none" '
+        f'stroke="#fff4b8" stroke-width="9" stroke-linecap="round" '
+        f'stroke-dasharray="10 {snake_path_length - 10}" '
+        f'stroke-dashoffset="-{snake_offset + snake_body_length}"/>'
+        f'</g>'
+    )
 
     # legend: Less [][][][][] More (bottom-right of the grid)
     leg_y = grid_top + art_h + 6
@@ -195,7 +213,7 @@ def render(data):
     rng = data["range"]
 
     ly = sep_y + 24
-    parts.append(f'<text x="{PAD}" y="{ly}" font-size="13" fill="{GREEN}" font-weight="700">'
+    parts.append(f'<text x="{PAD}" y="{ly}" font-size="13" fill="{BLUE}" font-weight="700">'
                  f'{total:,} contributions in the last year</text>')
     parts.append(f'<text x="{canvas_w - PAD}" y="{ly}" font-size="12" fill="{MUTED}" text-anchor="end">'
                  f'{rng["start"]} &#8594; {rng["end"]}</text>')
@@ -212,7 +230,8 @@ def render(data):
 if __name__ == "__main__":
     data = json.load(open(IN_PATH))
     svg = render(data)
-    assert 'id="snake-path"' in svg and svg.count("<animateMotion") == 7
+    assert 'class="snake-body"' in svg and 'class="snake-head"' in svg
+    assert "<animateMotion" not in svg
     with open(OUT_PATH, "w") as f:
         f.write(svg)
     print(f"wrote {OUT_PATH} ({len(svg)} bytes)")
