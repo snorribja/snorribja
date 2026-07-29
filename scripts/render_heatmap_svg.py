@@ -4,7 +4,7 @@ Render data/contributions.json (produced by fetch_contributions.py) as a proper
 GitHub-style contribution heatmap SVG: a grid of rounded, colored BOXES in the
 classic 53-week x 7-day calendar, revealed once with a diagonal line-after-line
 slide-down (CSS keyframes, plays on load then freezes -- no looping "glow"), a
-Less->More legend, and a real stats footer.
+snake that winds through the cells, a Less->More legend, and a real stats footer.
 
 Run by .github/workflows/update-profile-art.yml after fetch_contributions.py.
 """
@@ -99,6 +99,15 @@ def render(data):
     canvas_w = PAD + LEFT_LABEL_W + art_w + PAD
     stats_h = 88
     canvas_h = TITLEBAR_H + TOP_LABEL_H + art_h + stats_h + PAD
+    grid_top = TITLEBAR_H + TOP_LABEL_H
+    grid_left = PAD + LEFT_LABEL_W
+
+    snake_points = []
+    for ri in range(7):
+        columns = range(n_cols) if ri % 2 == 0 else range(n_cols - 1, -1, -1)
+        snake_points.extend((grid_left + ci * STEP + CELL / 2, grid_top + ri * STEP + CELL / 2)
+                            for ci in columns)
+    snake_path = "M" + " L".join(f"{x:g},{y:g}" for x, y in snake_points)
 
     css = f"""
 @keyframes cell {{
@@ -106,6 +115,10 @@ def render(data):
   100% {{ opacity: 1; transform: translateY(0); }}
 }}
 .c {{ opacity: 0; animation: cell {CELL_DUR:.2f}s cubic-bezier(.2,.8,.2,1) both; }}
+@media (prefers-reduced-motion: reduce) {{
+  .c {{ opacity: 1; animation: none; }}
+  .snake {{ display: none; }}
+}}
 """.strip()
 
     parts = [
@@ -115,6 +128,7 @@ def render(data):
         '<defs>'
         f'<linearGradient id="hbg" x1="0" y1="0" x2="0" y2="1">'
         f'<stop offset="0" stop-color="{BG2}"/><stop offset="1" stop-color="{BG}"/></linearGradient>'
+        f'<path id="snake-path" d="{snake_path}"/>'
         '</defs>',
         f'<rect width="{canvas_w}" height="{canvas_h}" rx="12" fill="url(#hbg)"/>',
         f'<rect x="0.5" y="0.5" width="{canvas_w-1}" height="{canvas_h-1}" rx="12" '
@@ -125,9 +139,6 @@ def render(data):
         parts.append(f'<circle cx="{PAD + i*16}" cy="{TITLEBAR_H/2}" r="5" fill="{dotcol}"/>')
     parts.append(f'<text x="{canvas_w/2}" y="{TITLEBAR_H/2 + 4}" fill="{MUTED}" font-size="12" '
                  f'text-anchor="middle">snorribja@github: ~/contributions --graph</text>')
-
-    grid_top = TITLEBAR_H + TOP_LABEL_H
-    grid_left = PAD + LEFT_LABEL_W
 
     for ci, label in month_labels:
         x = grid_left + ci * STEP
@@ -152,6 +163,17 @@ def render(data):
                 f'fill="{PALETTE[lvl]}" style="animation-delay:{delay:.3f}s">'
                 f'<title>{date_s}: {count} contribution{plural}</title></rect>'
             )
+
+    parts.append('<g class="snake" aria-hidden="true">')
+    for i in range(6, -1, -1):
+        radius = 4.5 - i * 0.35
+        color = "#b4ffaa" if i == 0 else GREEN
+        parts.append(
+            f'<circle r="{radius:.2f}" fill="{color}" opacity="{1 - i*0.08:.2f}">'
+            f'<animateMotion dur="24s" begin="{1.4 + i*0.07:.2f}s" repeatCount="indefinite">'
+            f'<mpath href="#snake-path"/></animateMotion></circle>'
+        )
+    parts.append("</g>")
 
     # legend: Less [][][][][] More (bottom-right of the grid)
     leg_y = grid_top + art_h + 6
@@ -190,6 +212,7 @@ def render(data):
 if __name__ == "__main__":
     data = json.load(open(IN_PATH))
     svg = render(data)
+    assert 'id="snake-path"' in svg and svg.count("<animateMotion") == 7
     with open(OUT_PATH, "w") as f:
         f.write(svg)
     print(f"wrote {OUT_PATH} ({len(svg)} bytes)")
