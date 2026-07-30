@@ -57,7 +57,7 @@ def render():
         f'font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">',
         '<title id="title">Signals to systems</title>',
         '<desc id="desc">EEG, ECG, and respiratory traces representing '
-        'Snorri Bjarkason&apos;s work in physiological signals and applied machine learning.</desc>',
+        'Snorri Bjarkason&apos;s interests in physiological signals and applied machine learning.</desc>',
         '<defs>',
         '<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">'
         f'<stop stop-color="{BG2}"/><stop offset="1" stop-color="{BG}"/></linearGradient>',
@@ -77,9 +77,9 @@ def render():
         parts.append(f'<circle cx="{22 + i * 16}" cy="15" r="5" fill="{color}"/>')
     parts.extend([
         f'<text x="{W / 2}" y="19" fill="{MUTED}" font-size="11" text-anchor="middle">'
-        'NORTHERN SIGNAL LAB · REYKJAVÍK → NEW YORK</text>',
+        'NORTHERN SIGNAL LAB · ICELAND / NEW YORK</text>',
         f'<text x="{W - 22}" y="19" fill="{GOLD}" font-size="9" text-anchor="end">'
-        'OPEN TO INTERNSHIPS</text>',
+        'DUAL U.S.–ICELANDIC CITIZEN</text>',
     ])
 
     for x in range(X0, X1 + 1, 30):
@@ -112,7 +112,7 @@ def render():
 if __name__ == "__main__":
     svg = render()
     assert svg.count('class="trace"') == 3
-    assert all(label in svg for label in ("EEG", "ECG", "RIP", "NEW YORK", "INTERNSHIPS"))
+    assert all(label in svg for label in ("EEG", "ECG", "RIP", "NEW YORK", "CITIZEN"))
     with open(OUT, "w") as f:
         f.write(svg)
     print(f"wrote {OUT} ({len(svg)} bytes)")

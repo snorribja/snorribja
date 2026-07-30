@@ -15,9 +15,9 @@
 </tr>
 </table>
 
-## Research engineer moving from Reykjavík to New York to continue my studies — open to internships.
+## From Iceland, living in New York — exploring signals, models, and software.
 
-<p>I build machine-learning and software systems for physiological time series, research, and data-heavy products.<br>I'm looking for New York internship opportunities in applied ML, data, research engineering, and software development.</p>
+<p>I'm Icelandic–American and a citizen of both the United States and Iceland.<br>My interests span physiological time series, applied machine learning, research software, and data-heavy products.</p>
 
 <br>
 
@@ -69,6 +69,6 @@ A browser-first CSV workbench that turns arbitrary datasets into explorable 3D s
 
 <br>
 
-<sub>REYKJAVÍK → NEW YORK · OPEN TO INTERNSHIPS</sub>
+<sub>FROM ICELAND · LIVING IN NEW YORK · U.S. + ICELANDIC CITIZEN</sub>
 
 </div>
