@@ -5,7 +5,6 @@
   Regenerate with:
     python scripts/make_ascii_svg.py
     python scripts/make_wordmark_svg.py
-    python scripts/make_signal_lab_svg.py
 -->
 
 <table>
@@ -17,11 +16,7 @@
 
 ## From Iceland, living in New York — exploring signals, models, and software.
 
-<p>I'm Icelandic–American and a citizen of both the United States and Iceland.<br>My interests span physiological time series, applied machine learning, research software, and data-heavy products.</p>
-
-<br>
-
-<img src="./signal-lab.svg" width="860" alt="EEG, ECG, and respiratory waveforms flowing from physiological signals to representations and useful decisions" />
+<p>I'm a dual citizen of Iceland and the United States.<br>My interests span time series, applied machine learning, research software, and data-heavy products.</p>
 
 </div>
 
@@ -42,13 +37,13 @@ An open-access review of respiratory inductance plethysmography, from measuremen
 <sub>BUILDING FOR ICELAND</sub><br><br>
 <a href="https://golfkortari.snorribjarkason.com"><strong>Golfkortari</strong></a><br>
 An Icelandic golf-course map and personal tracker with accounts, course progress, ratings, notes, and wishlists.<br><br>
-<a href="https://github.com/snorribja/golfkortari"><code>source →</code></a>
+<a href="https://golfkortari.snorribjarkason.com/"><code>live site →</code></a> · <a href="https://github.com/snorribja/golfkortari"><code>source →</code></a>
 </td>
 <td width="50%" valign="top">
 <sub>DATA, MADE TANGIBLE</sub><br><br>
 <a href="https://statzooka.snorribjarkason.com"><strong>Statzooka</strong></a><br>
 A browser-first CSV workbench that turns arbitrary datasets into explorable 3D scatter plots without uploading the data.<br><br>
-<a href="https://github.com/snorribja/statzooka"><code>source →</code></a>
+<a href="https://statzooka.snorribjarkason.com/"><code>live site →</code></a> · <a href="https://github.com/snorribja/statzooka"><code>source →</code></a>
 </td>
 </tr>
 </table>
