@@ -77,9 +77,9 @@ def render():
         parts.append(f'<circle cx="{22 + i * 16}" cy="15" r="5" fill="{color}"/>')
     parts.extend([
         f'<text x="{W / 2}" y="19" fill="{MUTED}" font-size="11" text-anchor="middle">'
-        'NORTHERN SIGNAL LAB · REYKJAVÍK</text>',
-        f'<text x="{W - 22}" y="19" fill="{MUTED}" font-size="9" text-anchor="end">'
-        '64.1466°N · 21.9426°W</text>',
+        'NORTHERN SIGNAL LAB · REYKJAVÍK → NEW YORK</text>',
+        f'<text x="{W - 22}" y="19" fill="{GOLD}" font-size="9" text-anchor="end">'
+        'OPEN TO INTERNSHIPS</text>',
     ])
 
     for x in range(X0, X1 + 1, 30):
@@ -103,7 +103,7 @@ def render():
         f'<text x="22" y="241" fill="{TEXT}" font-size="13" font-weight="700">'
         'physiological signals  →  representations  →  useful decisions</text>',
         f'<text x="{W - 22}" y="241" fill="{MUTED}" font-size="11" text-anchor="end">'
-        'APPLIED ML · RESEARCH ENGINEERING · SOFTWARE</text>',
+        'APPLIED ML · DATA · RESEARCH ENGINEERING · SOFTWARE</text>',
         '</svg>',
     ])
     return "".join(parts)
@@ -112,7 +112,7 @@ def render():
 if __name__ == "__main__":
     svg = render()
     assert svg.count('class="trace"') == 3
-    assert all(label in svg for label in ("EEG", "ECG", "RIP", "64.1466°N"))
+    assert all(label in svg for label in ("EEG", "ECG", "RIP", "NEW YORK", "INTERNSHIPS"))
     with open(OUT, "w") as f:
         f.write(svg)
     print(f"wrote {OUT} ({len(svg)} bytes)")

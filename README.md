@@ -15,9 +15,9 @@
 </tr>
 </table>
 
-## Research engineer in Reykjavík, building at the intersection of signals, models, and software.
+## Research engineer moving from Reykjavík to New York to continue my studies — open to internships.
 
-<p>I work with physiological time series and applied machine learning for sleep research.<br>Outside the lab, I build data tools, web products, and systems that make complex things useful.</p>
+<p>I build machine-learning and software systems for physiological time series, research, and data-heavy products.<br>I'm looking for New York internship opportunities in applied ML, data, research engineering, and software development.</p>
 
 <br>
 
@@ -69,6 +69,6 @@ A browser-first CSV workbench that turns arbitrary datasets into explorable 3D s
 
 <br>
 
-<sub>64.1466° N · 21.9426° W — Reykjavík, Iceland</sub>
+<sub>REYKJAVÍK → NEW YORK · OPEN TO INTERNSHIPS</sub>
 
 </div>
