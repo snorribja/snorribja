@@ -17,7 +17,7 @@ IN_PATH = os.path.join(HERE, "..", "data", "contributions.json")
 OUT_PATH = os.path.join(HERE, "..", "contrib-heatmap.svg")
 
 # Blue-to-yellow ramp: empty -> brightest.
-PALETTE = ["#161b22", "#0d419d", "#1f6feb", "#58a6ff", "#d29922", "#f2cc60"]
+PALETTE = ["#161b22", "#1f6feb", "#388bfd", "#58a6ff", "#d29922", "#f2cc60"]
 
 CELL = 12
 GAP = 3
@@ -27,7 +27,7 @@ LEFT_LABEL_W = 30
 TOP_LABEL_H = 20
 TITLEBAR_H = 30
 
-BG = "#0a0e14"
+BG = "#070b12"
 BG2 = "#0d1420"
 FRAME = "#1f6feb"
 MUTED = "#7d8590"
@@ -136,7 +136,12 @@ def render(data):
 
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{canvas_w}" height="{canvas_h}" '
-        f'viewBox="0 0 {canvas_w} {canvas_h}" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">',
+        f'viewBox="0 0 {canvas_w} {canvas_h}" role="img" '
+        f'aria-labelledby="contribution-title contribution-desc" '
+        f'font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">',
+        '<title id="contribution-title">Snorri&apos;s public contribution signal</title>',
+        '<desc id="contribution-desc">A blue and gold calendar heatmap of public GitHub '
+        'contributions with an animated gold snake.</desc>',
         f'<style>{css}</style>',
         '<defs>'
         f'<linearGradient id="hbg" x1="0" y1="0" x2="0" y2="1">'
@@ -150,7 +155,9 @@ def render(data):
     for i, dotcol in enumerate(["#ff5f56", "#ffbd2e", "#27c93f"]):
         parts.append(f'<circle cx="{PAD + i*16}" cy="{TITLEBAR_H/2}" r="5" fill="{dotcol}"/>')
     parts.append(f'<text x="{canvas_w/2}" y="{TITLEBAR_H/2 + 4}" fill="{MUTED}" font-size="12" '
-                 f'text-anchor="middle">snorribja@github: ~/contributions --graph</text>')
+                 f'text-anchor="middle">PUBLIC BUILD SIGNAL · LAST 52 WEEKS</text>')
+    parts.append(f'<text x="{canvas_w-PAD}" y="{TITLEBAR_H/2 + 3}" fill="{GOLD}" font-size="9" '
+                 f'text-anchor="end">SNAKE ONLINE</text>')
 
     for ci, label in month_labels:
         x = grid_left + ci * STEP
@@ -208,18 +215,20 @@ def render(data):
 
     cs = data["current_streak"]["length"]
     ls = data["longest_streak"]["length"]
+    cs_unit = "day" if cs == 1 else "days"
+    ls_unit = "day" if ls == 1 else "days"
     total = data["total_contributions"]
     best = data["best_day"]
     rng = data["range"]
 
     ly = sep_y + 24
     parts.append(f'<text x="{PAD}" y="{ly}" font-size="13" fill="{BLUE}" font-weight="700">'
-                 f'{total:,} contributions in the last year</text>')
+                 f'{total:,} public contributions in the last year</text>')
     parts.append(f'<text x="{canvas_w - PAD}" y="{ly}" font-size="12" fill="{MUTED}" text-anchor="end">'
                  f'{rng["start"]} &#8594; {rng["end"]}</text>')
     ly += 24
     parts.append(f'<text x="{PAD}" y="{ly}" font-size="13" fill="{ACCENT}">'
-                 f'current streak {cs} days   &#183;   longest {ls} days</text>')
+                 f'current streak {cs} {cs_unit}   &#183;   longest {ls} {ls_unit}</text>')
     parts.append(f'<text x="{canvas_w - PAD}" y="{ly}" font-size="12" fill="{GOLD}" text-anchor="end">'
                  f'best day {best["count"]} on {best["date"]}</text>')
 

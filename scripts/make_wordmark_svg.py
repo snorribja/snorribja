@@ -14,8 +14,8 @@ are trimmed, which is what keeps the file to a sane size.
 
 All modes open with the same left-to-right wipe, then differ in the rotation:
   rock   -- oscillates +/-11 deg around the rest pose, forever (this is the one
-            wired into the README)
-  once   -- one full 360 deg turn, then freezes on the 3/4 rest pose
+            for experimental renders)
+  once   -- one full 360 deg turn, then freezes on the 3/4 rest pose (README)
   spin   -- continuous 360 deg turntable, forever
   static -- frozen frame 0, no animation, for eyeballing a render
 
@@ -80,11 +80,11 @@ FOG = 0.34             # how much the far end of the word dims, 0..1
 FOG_SPAN = 0.55        # world-units of depth the fog ramp covers
 
 # ---- palette (matches the rest of the profile) ----------------------------
-BG = "#0d1117"
-BG2 = "#111722"
-FRAME = "#30363d"
-TITLE_TEXT = "#7d8590"
-INK = "#c9d1d9"
+BG = "#070b12"
+BG2 = "#0d1420"
+FRAME = "#1f6feb"
+TITLE_TEXT = "#8b949e"
+INK = "#f2cc60"
 
 PAD = 18
 TITLEBAR_H = 28
@@ -244,6 +244,8 @@ def emit(frames, mode, out, dur, reveal):
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{canvas_w:.0f}" height="{canvas_h:.0f}" '
         f'viewBox="0 0 {canvas_w:.0f} {canvas_h:.0f}" font-family="ui-monospace, SFMono-Regular, '
         f'Menlo, Consolas, monospace">',
+        '<style>@media(prefers-reduced-motion:reduce){'
+        '.motion{display:none}.still{display:inline!important}}</style>',
         '<defs><linearGradient id="wbg" x1="0" y1="0" x2="0" y2="1">'
         f'<stop offset="0" stop-color="{BG2}"/><stop offset="1" stop-color="{BG}"/>'
         '</linearGradient></defs>',
@@ -255,7 +257,7 @@ def emit(frames, mode, out, dur, reveal):
     for i, dot in enumerate(["#ff5f56", "#ffbd2e", "#27c93f"]):
         p.append(f'<circle cx="{PAD + i*15}" cy="{TITLEBAR_H/2}" r="4.5" fill="{dot}"/>')
     p.append(f'<text x="{canvas_w/2:.0f}" y="{TITLEBAR_H/2 + 4:.0f}" fill="{TITLE_TEXT}" '
-        f'font-size="11.5" text-anchor="middle">snorribja@github: ~$ ./wordmark.sh --3d</text>')
+        f'font-size="11.5" text-anchor="middle">SB / ASCII OBJECT · 64° NORTH</text>')
 
     def frame_g(rows, extra=""):
         out_rows = []
@@ -280,6 +282,9 @@ def emit(frames, mode, out, dur, reveal):
             fh.write("".join(p))
         print("wrote", out)
         return
+
+    p.append(frame_g(frames[0], ' class="still" style="display:none"'))
+    p.append('<g class="motion">')
 
     # intro (all modes): the resting pose wipes in left -> right behind a soft bar
     p.append(f'<clipPath id="wipe"><rect x="{PAD}" y="{art_top:.1f}" height="{art_h:.1f}" width="0">'
@@ -314,6 +319,7 @@ def emit(frames, mode, out, dur, reveal):
                     f'repeatCount="indefinite"/>')
             p.append(frame_g(rows, ' opacity="0"').replace("</g>", anim + "</g>"))
 
+    p.append("</g>")
     p.append("</svg>")
     svg = "".join(p)
     with open(out, "w") as fh:
@@ -323,7 +329,7 @@ def emit(frames, mode, out, dur, reveal):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", choices=["spin", "once", "rock", "static"], default="rock")
+    ap.add_argument("--mode", choices=["spin", "once", "rock", "static"], default="once")
     ap.add_argument("--out", default=None)
     ap.add_argument("--frames", type=int, default=None)
     ap.add_argument("--dur", type=float, default=None)
@@ -350,13 +356,14 @@ def main():
     proj = [project(P, N, y) for y in yaws]
     scale, cx, cy = fit(proj)
     frames = [rasterize(q, scale, cx, cy) for q in proj]
+    assert frames and any(row.strip() for row in frames[0])
 
     if a.preview:
         for row in frames[0]:
             print(row.rstrip())
         return
 
-    out = a.out or os.path.join(HERE, "..", "wordmark.svg" if a.mode == "rock" else f"wordmark-{a.mode}.svg")
+    out = a.out or os.path.join(HERE, "..", "wordmark.svg" if a.mode == "once" else f"wordmark-{a.mode}.svg")
     emit(frames, a.mode, out, dur, a.reveal)
 
 

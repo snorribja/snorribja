@@ -1,11 +1,10 @@
 """
-Convert a portrait photo into a CLEAN, monochrome ASCII-art SVG (Andrew6rant
-style: one light-gray color, subject isolated on a dark background) that "types"
-itself in like a terminal, then holds.
+Convert a portrait photo into a clean ice-blue ASCII-art SVG that "types" itself
+in like a terminal, then holds. It belongs to the profile's blue-and-gold
+"Northern Signal" palette.
 
-Monochrome is deliberate -- per-character rainbow color is what makes ASCII
-portraits look noisy. One fill color + a good density ramp + high contrast (so a
-busy background washes out to blank) reads as neat and legible.
+One ink color + a good density ramp + high contrast (so a busy background
+washes out to blank) keeps the portrait neat and legible.
 
 GitHub renders SVGs embedded via <img> and runs their SMIL animations there (JS
 does not run). Each row is revealed with a left-to-right clip wipe plus a small
@@ -45,12 +44,12 @@ ART_H = ROWS * CELL_H
 CANVAS_W = ART_W + PAD * 2
 CANVAS_H = TITLEBAR_H + ART_H + STATUS_H + PAD
 
-BG = "#0d1117"
-BG2 = "#111722"
-FRAME = "#30363d"
-TITLE_TEXT = "#7d8590"
-INK = "#c9d1d9"      # the single ascii color (matches Andrew6rant)
-CURSOR = "#c9d1d9"
+BG = "#070b12"
+BG2 = "#0d1420"
+FRAME = "#1f6feb"
+TITLE_TEXT = "#8b949e"
+INK = "#b6dcff"
+CURSOR = "#f2cc60"
 
 # ---- reveal timing (one-shot; a cursor rasters top -> bottom) -------------
 ROW_DUR = 0.11
@@ -90,10 +89,12 @@ parts.append(
     f'viewBox="0 0 {CANVAS_W} {CANVAS_H}" font-family="ui-monospace, SFMono-Regular, '
     f'Menlo, Consolas, monospace">'
 )
+parts.append('<style>@media(prefers-reduced-motion:reduce){'
+             '.reveal{clip-path:none!important}.cursor{display:none}}</style>')
 parts.append('<defs>'
              f'<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">'
              f'<stop offset="0" stop-color="{BG2}"/><stop offset="1" stop-color="{BG}"/>'
-             f'</linearGradient></defs>')
+             '</linearGradient></defs>')
 
 parts.append(f'<rect width="{CANVAS_W}" height="{CANVAS_H}" rx="12" fill="url(#bg)"/>')
 parts.append(f'<rect x="0.5" y="0.5" width="{CANVAS_W-1}" height="{CANVAS_H-1}" rx="12" '
@@ -103,7 +104,7 @@ parts.append(f'<line x1="0" y1="{TITLEBAR_H}" x2="{CANVAS_W}" y2="{TITLEBAR_H}" 
 for i, dotcol in enumerate(["#ff5f56", "#ffbd2e", "#27c93f"]):
     parts.append(f'<circle cx="{PAD + i*16}" cy="{TITLEBAR_H/2}" r="5" fill="{dotcol}"/>')
 parts.append(f'<text x="{CANVAS_W/2}" y="{TITLEBAR_H/2 + 4}" fill="{TITLE_TEXT}" font-size="12" '
-             f'text-anchor="middle">snorribja@github: ~$ ./portrait.sh</text>')
+             f'text-anchor="middle">PORTRAIT.ASCII · SNORRI BJARKASON</text>')
 
 # one <text> per row (single color -> no per-char markup, tiny file)
 font_size = CELL_H * 0.86
@@ -124,24 +125,24 @@ for ry, line in enumerate(rows_txt):
         f'<animate attributeName="width" from="0" to="{ART_W}" begin="{delay:.3f}s" '
         f'dur="{ROW_DUR:.2f}s" fill="freeze"/></rect></clipPath>'
     )
-    parts.append(f'<g clip-path="url(#r{ry})">{text}</g>')
+    parts.append(f'<g class="reveal" clip-path="url(#r{ry})">{text}</g>')
     parts.append(
-        f'<rect y="{row_y+1:.1f}" width="{CELL_W}" height="{CELL_H-2}" fill="{CURSOR}" opacity="0">'
+        f'<rect class="cursor" y="{row_y+1:.1f}" width="{CELL_W}" height="{CELL_H-2}" '
+        f'fill="{CURSOR}" opacity="0">'
         f'<animate attributeName="x" from="{PAD}" to="{PAD+ART_W}" begin="{delay:.3f}s" '
         f'dur="{ROW_DUR:.2f}s" fill="freeze"/>'
         f'<set attributeName="opacity" to="0.85" begin="{delay:.3f}s"/>'
         f'<set attributeName="opacity" to="0" begin="{delay+ROW_DUR:.3f}s"/></rect>'
     )
 
-# status bar with a steady blinking cursor
+# identity bar
 status_line_y = TITLEBAR_H + ART_H + PAD * 0.35
 status_y = status_line_y + 19
 parts.append(f'<line x1="0" y1="{status_line_y:.1f}" x2="{CANVAS_W}" y2="{status_line_y:.1f}" stroke="{FRAME}"/>')
 parts.append(f'<text x="{PAD}" y="{status_y:.1f}" fill="{TITLE_TEXT}" font-size="13">'
-             f'snorribja@github:~$ whoami <tspan x="{PAD+211}" fill="{INK}">Snorri Bjarkason</tspan></text>')
-parts.append(f'<rect x="{PAD+336}" y="{status_y-12:.1f}" width="8" height="14" fill="{INK}">'
-             f'<animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.51;1" '
-             f'dur="1s" repeatCount="indefinite"/></rect>')
+             f'REYKJAVÍK · 64.1466° N</text>')
+parts.append(f'<text x="{CANVAS_W-PAD}" y="{status_y:.1f}" fill="{INK}" font-size="13" '
+             f'text-anchor="end">RESEARCH ENGINEER</text>')
 
 parts.append("</svg>")
 svg = "".join(parts)
