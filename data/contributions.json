@@ -1,22 +1,22 @@
 {
   "username": "snorribja",
-  "generated_at": "2026-10-29T13:13:45Z",
+  "generated_at": "2026-10-30T13:06:07Z",
   "range": {
     "start": "2025-10-26",
+    "end": "2026-10-30"
+  },
+  "total_contributions": 154,
+  "active_days": 106,
+  "avg_per_active_day": 1.5,
+  "current_streak": {
+    "length": 93,
+    "start": "2026-07-29",
     "end": "2026-10-29"
   },
-  "total_contributions": 152,
-  "active_days": 105,
-  "avg_per_active_day": 1.4,
-  "current_streak": {
-    "length": 92,
-    "start": "2026-07-29",
-    "end": "2026-10-28"
-  },
   "longest_streak": {
-    "length": 92,
+    "length": 93,
     "start": "2026-07-29",
-    "end": "2026-10-28"
+    "end": "2026-10-29"
   },
   "best_day": {
     "date": "2026-07-06",
@@ -73,7 +73,7 @@
     },
     {
       "month": "2026-10",
-      "total": 32
+      "total": 34
     }
   ],
   "days": [
@@ -1551,6 +1551,10 @@
     },
     {
       "date": "2026-10-29",
+      "count": 2
+    },
+    {
+      "date": "2026-10-30",
       "count": 0
     }
   ]
